@@ -55,7 +55,7 @@ def scrape_rapid_alerts(base_url_prefix, start_year, end_year):
                             'manufacturer': manufacturer
                         })
             all_alerts_data.extend(rapid_alerts_data)
-            time.sleep(1) # Be respectful to the server by adding a small delay
+            time.sleep(1) # small delay on server
 
         except requests.exceptions.RequestException as e:
             print(f"Error fetching the web page for {year}: {e}")

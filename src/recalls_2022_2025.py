@@ -93,7 +93,7 @@ def save_to_csv(data, filename="recalls_2022_2025.csv"):
         print(f"Error saving to CSV: {e}")
 
 if __name__ == "__main__":
-    start_year = 2022
+    start_year = 2025
     end_year = 2025
     scraped_data = scrape_recalled(start_year, end_year)
 
