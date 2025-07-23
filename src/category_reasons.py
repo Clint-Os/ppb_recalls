@@ -3,7 +3,7 @@ import re
 import os
 
 input_path = 'data/csv/recalls_2022_2025.csv'
-output_path = 'data/csv/category_reasons.csv'
+output_path = 'data/csv/reasons_with_year.csv' 
 
 def load_data(path):
     if not os.path.exists(path):
@@ -53,15 +53,31 @@ def categorize_reasons(reason: str) -> str:
     return "Other"
 
     
-def process_recalls(input_path, output_path):
+def process_recalls(input_path, output_path, summary_path):
         print(f"Loading data from {input_path}")
         df = load_data(input_path)
 
         df["clean_reasons"] = df["reason"].apply(clean_reasons)
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        df['year'] = df['date'].dt.year
         df["recall_category"] = df["clean_reasons"].apply(categorize_reasons)
+
+        df_out = df[[
+             "year",
+             "date",
+             "product_name",
+             "manufacturer", 
+             "recall_category",
+             "clean_reasons"
+        ]] 
+
+        df_out.to_csv(output_path, index=False)
+        print(f"Data processed and saved to {output_path}")
 
         category_counts = df["recall_category"].value_counts().reset_index()
         category_counts.columns = ["recall_category", "count"]
+        category_counts.to_csv(summary_path, index=False)
+        print(f"Category counts saved to {summary_path}") 
 
         other_reasons = (
             df[df["recall_category"] == "Other"]["clean_reasons"]
@@ -73,8 +89,8 @@ def process_recalls(input_path, output_path):
 
         df[df["recall_category"] == "Other"][["reason"]].to_csv('data/csv/other_reasons.csv', index=False)
 
-        category_counts.to_csv(output_path, index=False)
-        print(f"Processed {len(df)} recalls and saved category counts to {output_path}")
-
 if __name__ == "__main__":
-            process_recalls(input_path, output_path)
+    input_path = 'data/csv/recalls_2022_2025.csv'
+    output_path = 'data/csv/reasons_with_year.csv'
+    summary_path = 'data/csv/category_summary_2022_2025.csv'
+    process_recalls(input_path, output_path, summary_path)
